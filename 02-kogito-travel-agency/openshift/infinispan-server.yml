@@ -1,0 +1,112 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: infinispan-server
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    ports:
+      - name: 8080-tcp
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+      - name: 11222-tcp
+        port: 11222
+        protocol: TCP
+        targetPort: 11222
+    selector:
+      app: ${APPLICATION_NAME}
+      deployment: ${APPLICATION_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: ${APPLICATION_NAME}
+        deployment: ${APPLICATION_NAME}
+    template:
+      metadata:
+        labels:
+          app: ${APPLICATION_NAME}
+          deployment: ${APPLICATION_NAME}
+      spec:
+        containers:
+        - image: ${IMAGE}
+          name: ${APPLICATION_NAME}
+          ports:
+            - containerPort: 11211
+              protocol: TCP
+            - containerPort: 11222
+              protocol: TCP
+            - containerPort: 57600
+              protocol: TCP
+            - containerPort: 7600
+              protocol: TCP
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8181
+              protocol: TCP
+            - containerPort: 8888
+              protocol: TCP
+            - containerPort: 9990
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+              - /usr/local/bin/is_running.sh
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 80
+          readinessProbe:
+            exec:
+              command:
+              - /usr/local/bin/is_healthy.sh
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 80
+          resources:
+            requests:
+              cpu: ${CPU_REQUEST}
+              memory: ${MEMORY_REQUEST}
+            limits:
+              cpu: ${CPU_LIMIT}
+              memory: ${MEMORY_LIMIT}
+parameters:
+- description: The name for the application.
+  name: APPLICATION_NAME
+  required: true
+  value: infinispan-server
+- description: Infinispan image.
+  name: IMAGE
+  required: true
+  value: 'jboss/infinispan-server:10.0.0.Beta3'
+- name: CPU_REQUEST
+  required: true
+  value: '0.5'
+- name: CPU_LIMIT
+  required: true
+  value: '1'
+- name: MEMORY_REQUEST
+  required: true
+  value: '512Mi'
+- name: MEMORY_LIMIT
+  required: true
+  value: '1024Mi'
+
