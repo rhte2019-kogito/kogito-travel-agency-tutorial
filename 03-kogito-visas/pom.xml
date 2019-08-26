@@ -67,10 +67,14 @@
       <version>${kogito.version}</version>
     </dependency>
     <dependency>
-	  <groupId>org.kie.kogito</groupId>
-	  <artifactId>kogito-events-reactive-messaging-addon</artifactId>
-	  <version>${kogito.version}</version>
-	</dependency>
+	    <groupId>org.kie.kogito</groupId>
+	    <artifactId>kogito-events-reactive-messaging-addon</artifactId>
+	    <version>${kogito.version}</version>
+	  </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-health</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
