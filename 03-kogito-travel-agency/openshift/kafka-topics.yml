@@ -1,0 +1,23 @@
+---
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaTopic
+metadata:
+  name: visaapplications
+  labels:
+    strimzi.io/cluster: kafka-cluster
+spec:
+  partitions: 15
+  replicas: 2
+  config: {}
+
+---
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaTopic
+metadata:
+  name: kogito-processinstances-events
+  labels:
+    strimzi.io/cluster: kafka-cluster
+spec:
+  partitions: 15
+  replicas: 2
+  config: {}
