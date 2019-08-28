@@ -1,0 +1,126 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: data-index-service
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      expose: "true"
+    name: ${APPLICATION_NAME}
+  spec:
+    ports:
+      - name: http
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+    selector:
+      deployment: ${APPLICATION_NAME}
+      app: ${APPLICATION_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    port:
+      targetPort: 8080
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}
+      weight: 100
+    wildcardPolicy: None
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        deployment: ${APPLICATION_NAME}
+        app: ${APPLICATION_NAME}
+    template:
+      metadata:
+        labels:
+          deployment: ${APPLICATION_NAME}
+          app: ${APPLICATION_NAME}
+      spec:
+        containers:
+          - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            image: ${APPLICATION_IMAGE}
+            imagePullPolicy: IfNotPresent
+            name: ${APPLICATION_NAME}
+            ports:
+              - containerPort: 8080
+                name: http
+                protocol: TCP
+            resources:
+              limits:
+                cpu: ${CPU_LIMIT}
+                memory: ${MEMORY_LIMIT}
+              requests:
+                cpu: ${CPU_REQUEST}
+                memory: ${MEMORY_REQUEST}
+            securityContext:
+              privileged: false
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+              - mountPath: /deployments/config
+                name: config
+              - mountPath: /deployments/proto
+                name: proto
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+          - configMap:
+              defaultMode: 420
+              name: ${APPLICATION_CONFIGMAP}
+            name: config
+          - configMap:
+              defaultMode: 420
+              name: ${APPLICATION_PROTO_CONFIGMAP}
+            name: proto
+parameters:
+- description: The name for the application.
+  name: APPLICATION_NAME
+  required: true
+  value: data-index-service
+- name: APPLICATION_IMAGE
+  required: true
+  value: quay.io/btison/kogito-data-index-service:0.3.0
+- name: CPU_REQUEST
+  required: true
+  value: '0.1'
+- name: CPU_LIMIT
+  required: true
+  value: '0.5'
+- name: MEMORY_REQUEST
+  required: true
+  value: '200Mi'
+- name: MEMORY_LIMIT
+  required: true
+  value: '500Mi'
+- name: APPLICATION_CONFIGMAP
+  required: true
+  value: data-index-service
+- name: APPLICATION_PROTO_CONFIGMAP
+  required: true
+  value: data-index-service-proto
