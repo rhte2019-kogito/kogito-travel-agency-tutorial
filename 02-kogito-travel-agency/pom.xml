@@ -45,21 +45,6 @@
       <version>${kogito.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-decisiontables</artifactId>
-      <version>7.22.0.Final</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>drools-core</artifactId>
-          <groupId>org.drools</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>drools-compiler</artifactId>
-          <groupId>org.drools</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-health</artifactId>
     </dependency>
