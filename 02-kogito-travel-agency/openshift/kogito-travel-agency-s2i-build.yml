@@ -1,0 +1,102 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: kogito-travel-agency-s2i
+objects:
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: ${APPLICATION_NAME}
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    failedBuildsHistoryLimit: 5
+    output:
+      to:
+        kind: ImageStreamTag
+        name: '${APPLICATION_NAME}:latest'
+    runPolicy: Serial
+    source:
+      contextDir: '${GIT_CONTEXT_DIR}'
+      git:
+        uri: '${GIT_URL}'
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: ${BUILDER_IMAGE_IS}:${BUILDER_IMAGE_TAG}
+      type: Source
+    successfulBuildsHistoryLimit: 5
+    triggers:
+      - type: ConfigChange
+      - imageChange:
+        type: ImageChange
+    resources:
+      limits:
+        cpu: ${CPU_LIMIT}
+        memory: ${MEMORY_LIMIT}
+      requests:
+        cpu: ${CPU_REQUEST}
+        memory: ${MEMORY_LIMIT}
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      build: ${APPLICATION_NAME}
+      app: ${APPLICATION_NAME}
+    name: ${BUILDER_IMAGE_IS}
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+      - from:
+          kind: DockerImage
+          name: ${BUILDER_IMAGE}
+        importPolicy: {}
+        name: ${BUILDER_IMAGE_TAG}
+        referencePolicy:
+          type: Source
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      build: ${APPLICATION_NAME}
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    lookupPolicy:
+      local: false
+parameters:
+- description: The name for the application.
+  name: APPLICATION_NAME
+  required: true
+  value: kogito-travel-agency-s2i
+- name: GIT_URL
+  required: true
+  value: https://github.com/rhte2019-kogito/kogito-travel-agency-tutorial.git
+- name: GIT_CONTEXT_DIR
+  required: true
+  value: /02-kogito-travel-agency
+- name: BUILDER_IMAGE_IS
+  required: true
+  value: kogito-quarkus-ubi8-s2i
+- name: BUILDER_IMAGE
+  required: true
+  value: quay.io/kiegroup/kogito-quarkus-ubi8-s2i
+- name: BUILDER_IMAGE_TAG
+  required: true
+  value: '0.3.0'
+- name: CPU_REQUEST
+  required: true
+  value: '1'
+- name: CPU_LIMIT
+  required: true
+  value: '2'
+- name: MEMORY_REQUEST
+  required: true
+  value: '6Gi'
+- name: MEMORY_LIMIT
+  required: true
+  value: '6Gi'
