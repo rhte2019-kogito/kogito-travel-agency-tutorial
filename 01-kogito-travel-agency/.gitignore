@@ -1,18 +1,35 @@
+# Eclipse
+.project
+.classpath
+.settings/
 bin/
-/target
-/local
 
-# Eclipse, Netbeans and IntelliJ files
-/.*
-!.gitignore
-/nbproject
-/*.ipr
-/*.iws
-/*.iml
+# IntelliJ
+.idea
+*.ipr
+*.iml
+*.iws
 
-# Repository wide ignore mac DS_Store files
+# NetBeans
+nb-configuration.xml
+
+# Visual Studio Code
+.vscode
+
+# OSX
 .DS_Store
-*~
-/settings*.xml
-*.db
-*.tlog
+
+# Vim
+*.swp
+*.swo
+
+# patch
+*.orig
+*.rej
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
