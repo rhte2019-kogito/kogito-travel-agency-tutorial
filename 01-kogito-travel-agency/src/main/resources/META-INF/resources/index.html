@@ -114,8 +114,8 @@
                         "data-bookingnumber='" + (val.hotel != null ? val.hotel.bookingNumber : "") + "' " +
                         "data-phone='" + (val.hotel != null ? val.hotel.phone : "") + "' " +
                         "data-flightnumber='" + (val.flight != null ? val.flight.flightNumber : "") + "' " +
-                        "data-arrival='" + (val.flight != null ? val.flight.arrival : "") + "' " +
-                        "data-departure='" + (val.flight != null ? val.flight.departure : "") + "' " +
+                        "data-arrival='" + (val.flight != null ? val.flight.arrival.substring(0, 10) + " - " + val.flight.arrival.substring(11, 16) : "") + "' " +
+                        "data-departure='" + (val.flight != null ? val.flight.departure.substring(0, 10) + " - " + val.flight.departure.substring(11, 16) : "") + "' " +
                         "data-id='" + val.id + "'>" +
                         "   <span>Details</span>" +
                         "</button>&nbsp;" +
